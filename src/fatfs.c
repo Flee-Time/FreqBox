@@ -33,6 +33,7 @@ void MX_FATFS_Init(void)
   retSD = FATFS_LinkDriver(&SD_Driver, SDPath);
 
   /* USER CODE BEGIN Init */
+  disk_initialize(0);
   /* additional user code for init */
   /* USER CODE END Init */
 }
