@@ -29,9 +29,7 @@
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
+#include "modules/display/display.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
@@ -56,14 +54,15 @@
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-/* USER CODE BEGIN PFP */
-
-/* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
+void NoSDPresent(u8g2_t u8g2)
+{
+  noSDFrame1(u8g2);
+  HAL_Delay(500);
+  noSDFrame2(u8g2);
+  HAL_Delay(500);
+}
 
 /**
  * @brief  The application entry point.
@@ -71,27 +70,13 @@ void SystemClock_Config(void);
  */
 int main(void)
 {
-  /* USER CODE BEGIN 1 */
-
-  /* USER CODE END 1 */
-
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
-
-  /* Configure the system clock */
   SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
-
-  /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
   MX_RTC_Init();
@@ -99,30 +84,91 @@ int main(void)
   MX_SDIO_SD_Init();
   MX_TIM2_Init();
   MX_USART2_UART_Init();
-  /* USER CODE BEGIN 2 */
-  if (BSP_SD_IsDetected())
+
+  u8g2_t u8g2 = initDisplay();
+  HAL_Delay(100);
+  startScreen(u8g2);
+  HAL_Delay(750);
+
+  while (!BSP_SD_IsDetected())
   {
-    MX_FATFS_Init();
-    disk_initialize(0);
-    
-    // Turn on USB as Mass Storage Device when KEY button is held at startup
-    if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0))
+    NoSDPresent(u8g2);
+    HAL_Delay(500);
+  }
+
+  MX_FATFS_Init();
+
+  // Turn on USB as Mass Storage Device when KEY button is held at startup
+  if (!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0))
+  {
+    MX_USB_DEVICE_Init();
+
+    while (1)
     {
-      MX_USB_DEVICE_Init();
+      USBSDScreen(u8g2);
+
+      if (!BSP_SD_IsDetected() || HAL_GPIO_ReadPin(BUTTON_BACK_GPIO_Port, BUTTON_BACK_Pin))
+      {
+        HAL_NVIC_SystemReset();
+      }
     }
   }
-  /* USER CODE END 2 */
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
+  uint8_t SDChange = 0;
+
+  // -------------- Needed for the example ------------------
+  uint8_t doonce = 1;
+  // --------------------------------------------------------
+
   while (1)
   {
-    /* USER CODE END WHILE */
-    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-    HAL_Delay(250);
-    /* USER CODE BEGIN 3 */
+    while (!BSP_SD_IsDetected())
+    {
+      NoSDPresent(u8g2);
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+      SDChange = 1;
+    }
+
+    if (SDChange)
+    {
+      u8g2_ClearBuffer(&u8g2);
+      u8g2_SetFont(&u8g2, u8g2_font_4x6_mf);
+      u8g2_DrawStr(&u8g2, 10, 10, "SD Card Change Detected");
+      u8g2_DrawStr(&u8g2, 10, 25, "Restarting");
+      u8g2_SendBuffer(&u8g2);
+
+      HAL_Delay(1000);
+      HAL_NVIC_SystemReset();
+    }
+
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+
+    //  Example code on how to write files to the sd card.
+    // ------------------------- Needed for the example ---------------------------
+    if (doonce)
+    {
+      const char* wtext = "test comment 1 2 3";
+
+      if (f_mount(&SDFatFS, (TCHAR const *)SDPath, 0) == 0)
+      {
+        if (f_open(&SDFile, "itworks.txt", FA_CREATE_ALWAYS | FA_WRITE) == FR_OK)
+        {
+          if (f_puts(wtext, &SDFile) > 0)
+          {
+            f_close(&SDFile);
+            doonce = 0;
+          }
+        }
+      }
+    }
+    // ---------------------------------------------------------------------------
+
+    u8g2_ClearBuffer(&u8g2);
+    u8g2_SetFont(&u8g2, u8g2_font_4x6_mf);
+    u8g2_DrawStr(&u8g2, 10, 10, "Placeholder");
+    u8g2_DrawStr(&u8g2, 10, 25, "Menu here");
+    u8g2_SendBuffer(&u8g2);
   }
-  /* USER CODE END 3 */
 }
 
 /**
