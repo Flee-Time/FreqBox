@@ -34,7 +34,6 @@ void MX_FATFS_Init(void)
 
   /* USER CODE BEGIN Init */
   disk_initialize(0);
-  /* additional user code for init */
   /* USER CODE END Init */
 }
 

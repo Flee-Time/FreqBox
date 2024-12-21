@@ -57,10 +57,12 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define CC1101_GD0_Pin GPIO_PIN_1
-#define CC1101_GD0_GPIO_Port GPIOA
-#define CC1101_CS_Pin GPIO_PIN_4
-#define CC1101_CS_GPIO_Port GPIOA
+#define BOARD_LED_Pin GPIO_PIN_13
+#define BOARD_LED_GPIO_Port GPIOC
+#define BUTTON_KEY_Pin GPIO_PIN_0
+#define BUTTON_KEY_GPIO_Port GPIOA
+#define SPI1_CS_Pin GPIO_PIN_4
+#define SPI1_CS_GPIO_Port GPIOA
 #define BUTTON_UP_Pin GPIO_PIN_12
 #define BUTTON_UP_GPIO_Port GPIOB
 #define BUTTON_RIGHT_Pin GPIO_PIN_13
@@ -69,10 +71,10 @@ void Error_Handler(void);
 #define BUTTON_DOWN_GPIO_Port GPIOB
 #define BUTTON_LEFT_Pin GPIO_PIN_8
 #define BUTTON_LEFT_GPIO_Port GPIOA
-#define BUTTON_BACK_Pin GPIO_PIN_9
-#define BUTTON_BACK_GPIO_Port GPIOA
-#define BUTTON_ACTION_Pin GPIO_PIN_10
-#define BUTTON_ACTION_GPIO_Port GPIOA
+#define BUTTON_CANCEL_Pin GPIO_PIN_9
+#define BUTTON_CANCEL_GPIO_Port GPIOA
+#define BUTTON_CONFIRM_Pin GPIO_PIN_10
+#define BUTTON_CONFIRM_GPIO_Port GPIOA
 #define SDIO_DETECT_Pin GPIO_PIN_8
 #define SDIO_DETECT_GPIO_Port GPIOB
 

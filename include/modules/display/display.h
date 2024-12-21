@@ -11,7 +11,7 @@
 #define screen_height 64
 
 // Public Functions
-u8g2_t initDisplay(void);
+u8g2_t initDisplay();
 void startScreen(u8g2_t u8g2);
 void noSDFrame1(u8g2_t u8g2);
 void noSDFrame2(u8g2_t u8g2);
