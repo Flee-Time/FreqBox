@@ -11,18 +11,18 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/Flee-Time/F_Light">
+  <a href="https://github.com/Flee-Time/FreqBox">
     <img src="documentation/readme/logo.png" alt="Logo" width="120" height="120">
   </a>
 
-  <h3 align="center">F_Light</h3>
+  <h3 align="center">FreqBox (Formerly F_Light)</h3>
 
   <p align="center">
     A small handheld device that does 433mhz attacks. Similar to the Flipper Zero.
     <br />
-    <a href="https://github.com/Flee-Time/F_Light/issues">Report Bug</a>
+    <a href="https://github.com/Flee-Time/FreqBox/issues">Report Bug</a>
     ·
-    <a href="https://github.com/Flee-Time/F_Light/issues">Request Feature</a>
+    <a href="https://github.com/Flee-Time/FreqBox/issues">Request Feature</a>
   </p>
 </div>
 
@@ -67,9 +67,7 @@
 
 This project aims to develop a small handheld device capable of various functionalities related to 433MHz radio communication. The device allows for receiving, transmitting, copying, saving, and jamming signals within the 433MHz frequency range. Additionally, it features a 128x64 I2C OLED screen and six buttons, four for navigation and two for confirming and canceling actions.
 
-F_Light stands for Free Light.
-
-To see the prototype PCB go to **[this](https://github.com/Flee-Time/F_Light_PCB)** repo.
+To see the prototype PCB go to **[this](https://github.com/Flee-Time/FreqBox_PCB)** repo.
 
 To see my workflow go to **[this](https://trello.com/b/z0zgr5WM)** Trello board.
 
@@ -101,7 +99,7 @@ This is the bare minimum you have to do to get the project running on bare metal
 
 1. Clone the repo.
    ```sh
-   git clone https://github.com/Flee-Time/F_Light.git
+   git clone https://github.com/Flee-Time/FreqBox.git
    ```
 2. Open the cloned project in VS Code with PlatformIO.
 <br>
@@ -192,11 +190,11 @@ PA3 --> RX
 
 Some schematics for the prototype device im using right now, keep in mind nothing is final at this stage.
 
-Please click **[here](https://github.com/Flee-Time/F_Light_PCB)** for the schematics.
+Please click **[here](https://github.com/Flee-Time/FreqBox_PCB)** for the schematics.
 
 ## Prototype Device Images
 
-_For pictures of the device, please refer to **[here](https://github.com/Flee-Time/F_Light/blob/F_Light_RTOS/documentation/device_pictures/PICS.md)**_
+_For pictures of the device, please refer to **[here](https://github.com/Flee-Time/FreqBox/blob/FreqBox/documentation/device_pictures/PICS.md)**_
 
 <!-- ROADMAP -->
 ## Roadmap
@@ -220,11 +218,8 @@ _For pictures of the device, please refer to **[here](https://github.com/Flee-Ti
     - [ ] Add saving raw rf recordings.
     - [ ] Add loading saved raw rf recordings.
 - [X] Make Prototype pcb with integrated components
-- [X] Switch to an RTOS
-- [ ] Rewrite everything using a more OOP approach
-- [ ] Write own hardware abstraction layer for optimization
 
-See the **[open issues](https://github.com/Flee-Time/F_Light/issues)** for a full list of proposed features (and known issues).
+See the **[open issues](https://github.com/Flee-Time/FreqBox/issues)** for a full list of proposed features (and known issues).
 
 
 <!-- CONTRIBUTING -->
@@ -244,7 +239,7 @@ If you have a suggestion that would make this better, please fork the repo and c
 <!-- LICENSE -->
 ## License
 
-This project is licensed under the GPL-3.0 License. Feel free to use, modify, and distribute the code according to the terms of the license. See **[LICENSE](https://github.com/Flee-Time/F_Light/blob/F_Light_RTOS/LICENSE)** for more information.
+This project is licensed under the GPL-3.0 License. Feel free to use, modify, and distribute the code according to the terms of the license. See **[LICENSE](https://github.com/Flee-Time/FreqBox/blob/FreqBox/LICENSE)** for more information.
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
@@ -274,13 +269,13 @@ Thanks to all the donators for making all of this possible. Without your support
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[forks-shield]: https://img.shields.io/github/forks/Flee-Time/F_Light.svg?style=for-the-badge
-[forks-url]: https://github.com/Flee-Time/F_Light/network/members
-[stars-shield]: https://img.shields.io/github/stars/Flee-Time/F_Light.svg?style=for-the-badge
-[stars-url]: https://github.com/Flee-Time/F_Light/stargazers
-[issues-shield]: https://img.shields.io/github/issues/Flee-Time/F_Light.svg?style=for-the-badge
-[issues-url]: https://github.com/Flee-Time/F_Light/issues
-[license-shield]: https://img.shields.io/github/license/Flee-Time/F_Light.svg?style=for-the-badge
-[license-url]: https://github.com/Flee-Time/F_Light/blob/master/LICENSE
+[forks-shield]: https://img.shields.io/github/forks/Flee-Time/FreqBox.svg?style=for-the-badge
+[forks-url]: https://github.com/Flee-Time/FreqBox/network/members
+[stars-shield]: https://img.shields.io/github/stars/Flee-Time/FreqBox.svg?style=for-the-badge
+[stars-url]: https://github.com/Flee-Time/FreqBox/stargazers
+[issues-shield]: https://img.shields.io/github/issues/Flee-Time/FreqBox.svg?style=for-the-badge
+[issues-url]: https://github.com/Flee-Time/FreqBox/issues
+[license-shield]: https://img.shields.io/github/license/Flee-Time/FreqBox.svg?style=for-the-badge
+[license-url]: https://github.com/Flee-Time/FreqBox/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/fleetimee

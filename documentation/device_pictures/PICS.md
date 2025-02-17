@@ -1,10 +1,10 @@
 <br />
 <div align="center">
-  <a href="https://github.com/Flee-Time/F_Light">
+  <a href="https://github.com/Flee-Time/FreqBox">
     <img src="../readme/logo.png" alt="Logo" width="120" height="120">
   </a>
 
-  <h3 align="center">F_Light</h3>
+  <h3 align="center">FreqBox (Formerly F_Light)</h3>
 
   <p align="center">
     Pictures of my current prototype device.
