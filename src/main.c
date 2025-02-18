@@ -1,21 +1,3 @@
-/* USER CODE BEGIN Header */
-/**
- ******************************************************************************
- * @file           : main.c
- * @brief          : Main program body
- ******************************************************************************
- * @attention
- *
- * Copyright (c) 2024 STMicroelectronics.
- * All rights reserved.
- *
- * This software is licensed under terms that can be found in the LICENSE file
- * in the root directory of this software component.
- * If no LICENSE file comes with this software, it is provided AS-IS.
- *
- ******************************************************************************
- */
-/* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "fatfs.h"
@@ -24,40 +6,11 @@
 /* Private includes ----------------------------------------------------------*/
 #include "modules/display/display.h"
 #include "graphics/menu_graphics.h"
-
-/* Private typedef -----------------------------------------------------------*/
-typedef struct {
-  uint32_t lastUpTick;
-  uint32_t lastDownTick;
-  uint32_t lastConfirmTick;
-  uint32_t lastBackTick;
-} InputDebounceTimes;
-
-typedef struct {
-  u8g2_t u8g2;
-  uint8_t *buffer;
-  uint8_t selectedMenu;
-  uint8_t selectedItem;
-  InputDebounceTimes debounceTimes;
-} DisplayContext;
-
-typedef struct {
-  char title[32];
-  char *itemIcon;
-  void (*action)();
-  char filename[32];
-} MenuItem;
-
-typedef struct {
-  char *title;
-  MenuItem *items;
-  size_t itemCount;
-} Menu;
+#include "modules/input/input.h"
 
 /* Private define ------------------------------------------------------------*/
 #define MENU_HIGHLIGHT_THICKNESS 3
 #define MENU_ITEM_SPACING 18
-#define DEBOUNCE_DELAY 300
 #define SD_DETECTION_DELAY 500
 
 /* Private variables ---------------------------------------------------------*/
@@ -67,11 +20,7 @@ SD_HandleTypeDef hsd;
 SPI_HandleTypeDef hspi1;
 UART_HandleTypeDef huart2;
 
-/* USER CODE BEGIN PV */
-static DisplayContext displayContext;
-static Menu mainMenu;
-static Menu settingsMenu;
-/* USER CODE END PV */
+DisplayManager dm;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
@@ -81,79 +30,41 @@ static void MX_RTC_Init(void);
 static void MX_SDIO_SD_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_USART2_UART_Init(void);
-static void gotoSettings(void);
-static void exitSubmenu(void);
 
-/* USER CODE BEGIN 0 */
+// INPUT SYSTEM FUNCTIONS -----------------------------------------------
 
-// Function Prototypes for Menu Operations
-void displayMenu(const Menu *menu, uint8_t selection);
-uint8_t handleInput(const Menu *menu);
-void drawScreen(const char time[7], uint8_t batteryLevel);
-void displaySDError(void);
-
-/* Initialize Menus */
-void initializeMenus() {
-  static MenuItem mainMenuItems[16] = {
-      {"Subghz Test", NULL, NULL, ""},
-      {"Option 2", NULL, NULL, ""},
-      {"System Settings", settings_icon, gotoSettings, ""},
-      {"Option 4", NULL, NULL, ""},
-      {"Option 5", NULL, NULL, ""}};
-  
-  mainMenu = (Menu){"Main Menu", mainMenuItems, sizeof(mainMenuItems) / sizeof(MenuItem)};
-  
-  static MenuItem settingsMenuItems[8] = {
-      {"Set DATE&TIME", clock_icon, NULL, ""},
-      {"Exit", NULL, exitSubmenu, ""},
-      {"Test 1", NULL, NULL, ""},
-      {"Test 2", NULL, NULL, ""}};
-  
-  settingsMenu = (Menu){"Settings", settingsMenuItems, sizeof(settingsMenuItems) / sizeof(MenuItem)};
-}
-
-// Menu Navigation
-void gotoSettings()
+void handleButtonUpAction()
 {
-  displayContext.selectedMenu = 1;
-  displayContext.selectedItem = 0;
 }
 
-void exitSubmenu()
+void handleButtonDownAction()
 {
-  displayContext.selectedMenu = -1;
-  displayContext.selectedItem = 0;
 }
 
-// Display Error if SD card fails
-void displaySDError() {
-  u8g2_ClearBuffer(&displayContext.u8g2);
-  u8g2_SetFont(&displayContext.u8g2, u8g2_font_4x6_mf);
-  u8g2_DrawStr(&displayContext.u8g2, 0, 10, "SD Init Failed");
-  u8g2_SendBuffer(&displayContext.u8g2);
+void handleButtonLeftAction()
+{
 }
 
-// Main Drawing Function
-void drawScreen(const char time[7], uint8_t batteryLevel) {
-  Menu *menus[] = {&mainMenu, &settingsMenu};
-
-  u8g2_ClearBuffer(&displayContext.u8g2);
-  u8g2_SetBitmapMode(&displayContext.u8g2, 1);
-  u8g2_SetDrawColor(&displayContext.u8g2, 1);
-  u8g2_DrawXBM(&displayContext.u8g2, 0, 0, screen_width, screen_height, m_back);
-  u8g2_DrawXBM(&displayContext.u8g2, 45, 1, bicon_width, bicon_height, battery[batteryLevel]);
-  u8g2_SetFont(&displayContext.u8g2, u8g2_font_4x6_mf);
-  u8g2_DrawStr(&displayContext.u8g2, 1, 7, time);
-
-  uint8_t selection = handleInput(menus[displayContext.selectedMenu]);
-  displayMenu(menus[displayContext.selectedMenu], selection);
-  u8g2_SendBuffer(&displayContext.u8g2);
+void handleButtonRightAction()
+{
 }
 
-/* USER CODE END 0 */
+void handleButtonSelectAction()
+{
+}
 
-int main(void) {
-  /* MCU Configuration */
+void handleButtonBackAction()
+{
+}
+
+void handleButtonKeyAction()
+{
+}
+
+// -----------------------------------------------------------------------
+
+void initializePeripherals()
+{
   HAL_Init();
   SystemClock_Config();
   MX_GPIO_Init();
@@ -162,54 +73,80 @@ int main(void) {
   MX_SDIO_SD_Init();
   MX_SPI1_Init();
   MX_USART2_UART_Init();
-  
-  /* USER CODE BEGIN Init */
-  initializeMenus();
-  displayContext.u8g2 = initDisplay();
-  HAL_Delay(100);
-  startScreen(displayContext.u8g2);
-  HAL_Delay(750);
+}
 
-  /* Check SD Card */
-  while (!BSP_SD_IsDetected()) {
-    displaySDError();
-    HAL_Delay(SD_DETECTION_DELAY);
-  }
-  MX_FATFS_Init();
-
-  if (!HAL_GPIO_ReadPin(BUTTON_KEY_GPIO_Port, BUTTON_KEY_Pin)) {
-    MX_USB_DEVICE_Init();
-    while (1) {
-      USBSDScreen(displayContext.u8g2);
-      if (!BSP_SD_IsDetected() || HAL_GPIO_ReadPin(BUTTON_CANCEL_GPIO_Port, BUTTON_CANCEL_Pin)) {
-        HAL_NVIC_SystemReset();
-      }
-    }
-  }
-
-  uint8_t SDChange = 0;
-
-  /* Infinite loop */
-  while (1) {
-    while (!BSP_SD_IsDetected()) {
-      displaySDError();
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
-      SDChange = 1;
-    }
-
-    if (SDChange) {
-      u8g2_ClearBuffer(&displayContext.u8g2);
-      u8g2_SetFont(&displayContext.u8g2, u8g2_font_4x6_mf);
-      u8g2_DrawStr(&displayContext.u8g2, 10, 10, "SD Card Change Detected");
-      u8g2_DrawStr(&displayContext.u8g2, 10, 25, "Restarting");
-      u8g2_SendBuffer(&displayContext.u8g2);
-
-      HAL_Delay(1000);
+void handleUSBConnection()
+{
+  MX_USB_DEVICE_Init();
+  while (1)
+  {
+    displayUSBSDScreen(&dm);
+    if (!BSP_SD_IsDetected() || HAL_GPIO_ReadPin(BUTTON_BACK_GPIO_Port, BUTTON_BACK_Pin))
+    {
       HAL_NVIC_SystemReset();
     }
-    // drawScreen(, 2); // Uncomment and complete as needed
   }
 }
+
+int main(void)
+{
+  initializePeripherals();
+  DM_init(&dm);
+  HAL_Delay(50);
+  displayWelcomeScreen(&dm);
+
+  bool SDPreviouslyDetected = BSP_SD_IsDetected();
+  uint32_t currentTime = HAL_GetTick();
+
+  // Some delay for the welcome scren and sdcard to init
+  HAL_Delay(500);
+
+  // Check if SD Card is inserted
+  while (!BSP_SD_IsDetected())
+  {
+    displayNoSDAnim(&dm, 0);
+    HAL_Delay(SD_DETECTION_DELAY);
+    displayNoSDAnim(&dm, 1);
+    HAL_Delay(SD_DETECTION_DELAY);
+  }
+
+  // Initialize FATFS if SDCARD is present
+  if (SDPreviouslyDetected)
+  {
+    MX_FATFS_Init();
+  }
+
+  if (!HAL_GPIO_ReadPin(BUTTON_KEY_GPIO_Port, BUTTON_KEY_Pin) && SDPreviouslyDetected)
+  {
+    handleUSBConnection();
+  }
+
+  /* Infinite loop */
+  while (1)
+  {
+    bool SDCurrentlyDetected = BSP_SD_IsDetected();
+    currentTime = HAL_GetTick();
+    updateButtonStates(currentTime);
+    handleButtonActions(currentTime);
+
+    // put other shenanigans here
+
+    if (!SDCurrentlyDetected)
+    {
+      displayNoSDAnim(&dm, 0);
+      HAL_Delay(SD_DETECTION_DELAY);
+      displayNoSDAnim(&dm, 1);
+      HAL_Delay(SD_DETECTION_DELAY);
+    }
+    else if (SDCurrentlyDetected && !SDPreviouslyDetected)
+    {
+      HAL_NVIC_SystemReset();
+    }
+
+    SDPreviouslyDetected = SDCurrentlyDetected;
+  }
+}
+
 /**
  * @brief System Clock Configuration
  * @retval None
@@ -271,7 +208,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.ClockSpeed = 100000;
+  hi2c1.Init.ClockSpeed = 700000;
   hi2c1.Init.DutyCycle = I2C_DUTYCYCLE_2;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
@@ -426,8 +363,8 @@ static void MX_USART2_UART_Init(void)
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-/* USER CODE END MX_GPIO_Init_1 */
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+  /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
@@ -462,13 +399,13 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(SPI1_CS_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : BUTTON_UP_Pin BUTTON_RIGHT_Pin BUTTON_DOWN_Pin */
-  GPIO_InitStruct.Pin = BUTTON_UP_Pin|BUTTON_RIGHT_Pin|BUTTON_DOWN_Pin;
+  GPIO_InitStruct.Pin = BUTTON_UP_Pin | BUTTON_RIGHT_Pin | BUTTON_DOWN_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : BUTTON_LEFT_Pin BUTTON_CANCEL_Pin BUTTON_CONFIRM_Pin */
-  GPIO_InitStruct.Pin = BUTTON_LEFT_Pin|BUTTON_CANCEL_Pin|BUTTON_CONFIRM_Pin;
+  /*Configure GPIO pins : BUTTON_LEFT_Pin BUTTON_BACK_Pin BUTTON_SELECT_Pin */
+  GPIO_InitStruct.Pin = BUTTON_LEFT_Pin | BUTTON_BACK_Pin | BUTTON_SELECT_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
@@ -479,8 +416,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(SDIO_DETECT_GPIO_Port, &GPIO_InitStruct);
 
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+  /* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */

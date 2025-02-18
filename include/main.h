@@ -28,6 +28,7 @@ extern "C" {
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_hal.h"
+#include <stdbool.h>
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -59,22 +60,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define BOARD_LED_Pin GPIO_PIN_13
 #define BOARD_LED_GPIO_Port GPIOC
-#define BUTTON_KEY_Pin GPIO_PIN_0
-#define BUTTON_KEY_GPIO_Port GPIOA
 #define SPI1_CS_Pin GPIO_PIN_4
 #define SPI1_CS_GPIO_Port GPIOA
-#define BUTTON_UP_Pin GPIO_PIN_12
-#define BUTTON_UP_GPIO_Port GPIOB
-#define BUTTON_RIGHT_Pin GPIO_PIN_13
-#define BUTTON_RIGHT_GPIO_Port GPIOB
-#define BUTTON_DOWN_Pin GPIO_PIN_14
-#define BUTTON_DOWN_GPIO_Port GPIOB
-#define BUTTON_LEFT_Pin GPIO_PIN_8
-#define BUTTON_LEFT_GPIO_Port GPIOA
-#define BUTTON_CANCEL_Pin GPIO_PIN_9
-#define BUTTON_CANCEL_GPIO_Port GPIOA
-#define BUTTON_CONFIRM_Pin GPIO_PIN_10
-#define BUTTON_CONFIRM_GPIO_Port GPIOA
 #define SDIO_DETECT_Pin GPIO_PIN_8
 #define SDIO_DETECT_GPIO_Port GPIOB
 
