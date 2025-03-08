@@ -1,5 +1,5 @@
-#ifndef __DISPLAY_CONTROLLER_H
-#define __DISPLAY_CONTROLLER_H
+#ifndef __DISPLAY_H
+#define __DISPLAY_H
 
 // Includes
 #include "stm32f4xx_hal.h"
@@ -21,6 +21,20 @@ typedef struct {
     uint16_t width;
     uint16_t height;
 } Image;
+
+typedef void (*MenuAction)(DisplayManager dm);
+
+typedef struct {
+    const char *label;
+    const char* menuIcon;
+    MenuAction action;
+} MenuItem;
+
+typedef struct {
+    const char *title;
+    MenuItem *items;
+    size_t num_items;
+} Menu;
 
 // Public Functions
 int DM_init(DisplayManager* dm);

@@ -5,9 +5,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 #include "modules/display/display.h"
-#include "graphics/menu_graphics.h"
 #include "modules/input/input.h"
-#include "modules/menu.h"
 
 /* Private define ------------------------------------------------------------*/
 #define MENU_HIGHLIGHT_THICKNESS 3
@@ -31,6 +29,12 @@ static void MX_RTC_Init(void);
 static void MX_SDIO_SD_Init(void);
 static void MX_SPI1_Init(void);
 static void MX_USART2_UART_Init(void);
+
+// -----------------------------------------------------------------------
+
+uint8_t currentSelection = 0;
+
+extern Menu mainMenu;
 
 // INPUT SYSTEM FUNCTIONS -----------------------------------------------
 
@@ -77,22 +81,6 @@ void handleButtonBackAction()
 void handleButtonKeyAction()
 {
 }
-
-// -----------------------------------------------------------------------
-
-uint8_t currentSelection = 0;
-
-MenuItem menuItems[] = {
-    {"Subghz Test", NULL, NULL},
-    {"Option 2", clock_icon, NULL},
-    {"System Settings", settings_icon, NULL},
-    {"Option 4", NULL, NULL},
-    {"Option 5", NULL, NULL}};
-
-Menu mainMenu = {
-    "Main Menu",
-    menuItems,
-    sizeof(menuItems) / sizeof(MenuItem)};
 
 // -----------------------------------------------------------------------
 

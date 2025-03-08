@@ -1,5 +1,4 @@
 #include "modules/display/display.h"
-#include "modules/menu.h"
 
 // Graphics
 #include "graphics/welcome_screen.h"
@@ -17,6 +16,18 @@ Image usbSDScreen = {usbsd_screen_bits, usbsd_screen_width, usbsd_screen_height}
 // Helper functions from another script
 extern uint8_t u8x8_stm32_gpio_and_delay(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr);
 extern uint8_t u8x8_byte_stm32_hw_i2c(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr);
+
+MenuItem menuItems[] = {
+    {"Subghz Test", NULL, NULL},
+    {"Option 2", clock_icon, NULL},
+    {"System Settings", settings_icon, NULL},
+    {"Option 4", NULL, NULL},
+    {"Option 5", NULL, NULL}};
+
+Menu mainMenu = {
+    "Main Menu",
+    menuItems,
+    sizeof(menuItems) / sizeof(MenuItem)};
 
 // Initialize the display manager
 int DM_init(DisplayManager *dm)
@@ -102,14 +113,14 @@ void displayNoSDAnim(DisplayManager *dm, uint8_t frame)
     }
 }
 
-void displayMenu(DisplayManager *dm, const Menu* menu, uint8_t selection)
+void displayMenu(DisplayManager *dm, const Menu *menu, uint8_t selection)
 {
     uint8_t y_offset = 0;
 
-    u8g2_SetDrawColor(&dm->u8g2,1);
+    u8g2_SetDrawColor(&dm->u8g2, 1);
     u8g2_SetFont(&dm->u8g2, u8g2_font_6x10_tr);
     u8g2_DrawStr(&dm->u8g2, 65, 9, menu->title);
-    u8g2_DrawBox(&dm->u8g2, 124, 5 + 54.5/menu->num_items * selection, 3, 54.5/menu->num_items);
+    u8g2_DrawBox(&dm->u8g2, 124, 5 + 54.5 / menu->num_items * selection, 3, 54.5 / menu->num_items);
 
     for (int i = (selection < (menu->num_items - 1) ? (selection < 1 ? 0 : (selection - 1)) : (selection - 2)); i < menu->num_items; i++)
     {
@@ -125,7 +136,7 @@ void displayMenu(DisplayManager *dm, const Menu* menu, uint8_t selection)
         u8g2_SetDrawColor(&dm->u8g2, selection == i ? 0 : 1);
         u8g2_SetFont(&dm->u8g2, u8g2_font_6x10_tr);
         u8g2_DrawStr(&dm->u8g2, 20, 23 + y_offset, menu->items[i].label);
-        u8g2_SetDrawColor(&dm->u8g2,0);
+        u8g2_SetDrawColor(&dm->u8g2, 0);
         y_offset += 18;
     }
 }
