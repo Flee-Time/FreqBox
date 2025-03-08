@@ -35,4 +35,6 @@ void displayUSBSDScreen(DisplayManager* dm);
 // Animation Functions
 void displayNoSDAnim(DisplayManager *dm, uint8_t frame);
 
+void displayMenu(DisplayManager *dm, const Menu* menu, uint8_t selection);
+
 #endif

@@ -7,6 +7,7 @@
 #include "modules/display/display.h"
 #include "graphics/menu_graphics.h"
 #include "modules/input/input.h"
+#include "modules/menu.h"
 
 /* Private define ------------------------------------------------------------*/
 #define MENU_HIGHLIGHT_THICKNESS 3
@@ -35,10 +36,26 @@ static void MX_USART2_UART_Init(void);
 
 void handleButtonUpAction()
 {
+  if (currentSelection > 0)
+  {
+    currentSelection--;
+  }
+  else
+  {
+    currentSelection = mainMenu.num_items - 1;
+  }
 }
 
 void handleButtonDownAction()
 {
+  if (currentSelection < mainMenu.num_items - 1)
+  {
+    currentSelection++;
+  }
+  else
+  {
+    currentSelection = 0;
+  }
 }
 
 void handleButtonLeftAction()
@@ -60,6 +77,22 @@ void handleButtonBackAction()
 void handleButtonKeyAction()
 {
 }
+
+// -----------------------------------------------------------------------
+
+uint8_t currentSelection = 0;
+
+MenuItem menuItems[] = {
+    {"Subghz Test", NULL, NULL},
+    {"Option 2", clock_icon, NULL},
+    {"System Settings", settings_icon, NULL},
+    {"Option 4", NULL, NULL},
+    {"Option 5", NULL, NULL}};
+
+Menu mainMenu = {
+    "Main Menu",
+    menuItems,
+    sizeof(menuItems) / sizeof(MenuItem)};
 
 // -----------------------------------------------------------------------
 
@@ -130,6 +163,7 @@ int main(void)
     handleButtonActions(currentTime);
 
     // put other shenanigans here
+    displayMenu(&dm, &mainMenu, currentSelection);
 
     if (!SDCurrentlyDetected)
     {

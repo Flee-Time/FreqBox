@@ -1,10 +1,12 @@
 #include "modules/display/display.h"
+#include "modules/menu.h"
 
 // Graphics
 #include "graphics/welcome_screen.h"
 #include "graphics/usbsd_screen.h"
 #include "graphics/anims/nosd_frame0.h"
 #include "graphics/anims/nosd_frame1.h"
+#include "graphics/menu_graphics.h"
 
 // Create instances of the image structs with friendly names
 Image welcomeScreen = {welcome_screen_bits, welcome_screen_width, welcome_screen_height};
@@ -53,6 +55,7 @@ void DM_deinit(DisplayManager *dm)
 void drawImage(DisplayManager *dm, const Image *img, int x, int y)
 {
     u8g2_ClearBuffer(&dm->u8g2);
+    u8g2_SetBitmapMode(&dm->u8g2, 1);
     u8g2_SetDrawColor(&dm->u8g2, 1);
     u8g2_DrawXBM(&dm->u8g2, x, y, img->width, img->height, img->bits);
     u8g2_SendBuffer(&dm->u8g2);
@@ -96,5 +99,33 @@ void displayNoSDAnim(DisplayManager *dm, uint8_t frame)
         break;
     default:
         break;
+    }
+}
+
+void displayMenu(DisplayManager *dm, const Menu* menu, uint8_t selection)
+{
+    uint8_t y_offset = 0;
+
+    u8g2_SetDrawColor(&dm->u8g2,1);
+    u8g2_SetFont(&dm->u8g2, u8g2_font_6x10_tr);
+    u8g2_DrawStr(&dm->u8g2, 65, 9, menu->title);
+    u8g2_DrawBox(&dm->u8g2, 124, 5 + 54.5/menu->num_items * selection, 3, 54.5/menu->num_items);
+
+    for (int i = (selection < (menu->num_items - 1) ? (selection < 1 ? 0 : (selection - 1)) : (selection - 2)); i < menu->num_items; i++)
+    {
+        u8g2_SetDrawColor(&dm->u8g2, 1);
+        u8g2_DrawXBM(&dm->u8g2, 1, 12 + y_offset, menu_item_width, menu_item_height, selection == i ? menu_item_highlighted : menu_item);
+
+        if (menu->items[i].menuIcon != NULL)
+        {
+            u8g2_SetDrawColor(&dm->u8g2, selection == i ? 0 : 1);
+            u8g2_DrawXBM(&dm->u8g2, 5, 14 + y_offset, menu_icon_width, menu_icon_height, menu->items[i].menuIcon);
+        }
+
+        u8g2_SetDrawColor(&dm->u8g2, selection == i ? 0 : 1);
+        u8g2_SetFont(&dm->u8g2, u8g2_font_6x10_tr);
+        u8g2_DrawStr(&dm->u8g2, 20, 23 + y_offset, menu->items[i].label);
+        u8g2_SetDrawColor(&dm->u8g2,0);
+        y_offset += 18;
     }
 }
