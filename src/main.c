@@ -33,6 +33,11 @@ static void MX_USART2_UART_Init(void);
 // -----------------------------------------------------------------------
 
 uint8_t currentSelection = 0;
+uint8_t batteryLevel = 3;
+
+char timeChar[8];
+RTC_TimeTypeDef sTime = {0};
+RTC_DateTypeDef sDate = {0};
 
 extern Menu mainMenu;
 
@@ -64,6 +69,12 @@ void handleButtonDownAction()
 
 void handleButtonLeftAction()
 {
+  batteryLevel++;
+
+  if (batteryLevel > 3)
+  {
+    batteryLevel = 0;
+  }
 }
 
 void handleButtonRightAction()
@@ -151,6 +162,10 @@ int main(void)
     handleButtonActions(currentTime);
 
     // put other shenanigans here
+    HAL_RTC_GetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
+    HAL_RTC_GetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
+    sprintf(timeChar, "%0.2d:%0.2d:%0.2d", sTime.Hours, sTime.Minutes, sTime.Seconds);
+
     displayMenu(&dm, &mainMenu, currentSelection);
 
     if (!SDCurrentlyDetected)

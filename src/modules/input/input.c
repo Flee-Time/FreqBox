@@ -1,7 +1,7 @@
 #include "modules/input/input.h"
 
 // Define debounce delay in milliseconds
-#define DEBOUNCE_DELAY_MS 50
+#define DEBOUNCE_DELAY_MS 25
 #define REPEAT_INTERVAL_MS 250
 
 // Array to hold the state of all buttons
@@ -26,10 +26,13 @@ void initializeButtons()
 // Read the current state of a button using GPIO
 bool readButtonHardware(Button button)
 {
-    if (button == BUTTON_KEY) {
+    if (button == BUTTON_KEY)
+    {
         // Invert the logic for BUTTON_KEY
         return HAL_GPIO_ReadPin(buttonPorts[button], buttonPins[button]) == GPIO_PIN_RESET;
-    } else {
+    }
+    else
+    {
         return HAL_GPIO_ReadPin(buttonPorts[button], buttonPins[button]) == GPIO_PIN_SET;
     }
 }
@@ -41,14 +44,14 @@ void updateButtonStates(uint32_t currentTime)
     {
         bool rawState = readButtonHardware((Button)i);
 
-        if (rawState != (buttonInfo[i].previousState == BUTTON_STATE_PRESSED))
-        {
-            buttonInfo[i].lastDebounceTime = currentTime;
-        }
-
         if ((currentTime - buttonInfo[i].lastDebounceTime) > DEBOUNCE_DELAY_MS)
         {
             buttonInfo[i].currentState = rawState ? BUTTON_STATE_PRESSED : BUTTON_STATE_RELEASED;
+        }
+
+        if (rawState != (buttonInfo[i].previousState == BUTTON_STATE_PRESSED))
+        {
+            buttonInfo[i].lastDebounceTime = currentTime;
         }
 
         buttonInfo[i].previousState = rawState ? BUTTON_STATE_PRESSED : BUTTON_STATE_RELEASED;

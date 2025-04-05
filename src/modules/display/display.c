@@ -115,12 +115,23 @@ void displayNoSDAnim(DisplayManager *dm, uint8_t frame)
 
 void displayMenu(DisplayManager *dm, const Menu *menu, uint8_t selection)
 {
+    extern uint8_t batteryLevel;
+    extern char timeChar[8];
     uint8_t y_offset = 0;
 
+    u8g2_ClearBuffer(&dm->u8g2);
     u8g2_SetDrawColor(&dm->u8g2, 1);
+
+    // Main menu backdrop stuff
+    u8g2_DrawXBM(&dm->u8g2, 0, 0, 128, 64, m_back);
+    u8g2_DrawXBM(&dm->u8g2, 45, 1, bicon_width, bicon_height, battery[batteryLevel]);
+    u8g2_SetFont(&dm->u8g2, u8g2_font_4x6_mf);
+    u8g2_DrawStr(&dm->u8g2, 1, 7, timeChar);
+    // -------------------------------------
+
     u8g2_SetFont(&dm->u8g2, u8g2_font_6x10_tr);
     u8g2_DrawStr(&dm->u8g2, 65, 9, menu->title);
-    u8g2_DrawBox(&dm->u8g2, 124, 5 + 54.5 / menu->num_items * selection, 3, 54.5 / menu->num_items);
+    u8g2_DrawBox(&dm->u8g2, 124, 5 + 55 / menu->num_items * selection, 3, 54 / menu->num_items);
 
     for (int i = (selection < (menu->num_items - 1) ? (selection < 1 ? 0 : (selection - 1)) : (selection - 2)); i < menu->num_items; i++)
     {
@@ -139,4 +150,6 @@ void displayMenu(DisplayManager *dm, const Menu *menu, uint8_t selection)
         u8g2_SetDrawColor(&dm->u8g2, 0);
         y_offset += 18;
     }
+
+    u8g2_SendBuffer(&dm->u8g2);
 }
